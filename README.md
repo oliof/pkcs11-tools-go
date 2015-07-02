@@ -9,7 +9,7 @@ A tool to generate a keypair inside a PKCS#11 crypto token.
 `pkcs11keypair` can be configured by setting environment variables, but applies
 it's own defaults in case a variable is unset.
 
-*    `HSMLIB`: Path to HSM Module library to use (default `/usr/lib/softhsm/libsofthsm.so`)
+*    `HSM_MODULE`: Path to HSM Module library to use (default `/usr/lib/softhsm/libsofthsm.so`)
 *    `HSM_SLOT_ID`: Slot ID to use (default `0`)
 *    `USER_PIN`: User PIN to login to token (default `0000`)
 *    `KEY_LABEL`: Label to use for key (default `pkcs11keypair_label`)
@@ -33,7 +33,7 @@ Usage example with SoftHSM (requires libsofthsm and pkcs11-tool):
         % export KEY_LABEL=some_key
         % export KEY_ID=12345
         # Initialize SoftHSM slot.
-        % pkcs11-tool --module ${HSM_LIB} --slot ${HSM_SLOT} --login\
+        % pkcs11-tool --module ${HSM_MODULE} --slot ${HSM_SLOT} --login\
           --init-token --init-pin --label ${TOKEN_LABEL} 
 
 (You will be prompted for SO PIN und User PIN. Don't mix them up)
@@ -55,7 +55,7 @@ Usage example with SoftHSM (requires libsofthsm and pkcs11-tool):
 
 3. Verify that the keypair has been generated:
 
-        % pkcs11-tool --module ${HSM_LIB} --login -O
+        % pkcs11-tool --module ${HSM_MODULE} --login -O
         Using slot 0 with a present token (0x0)
         Public Key Object; RSA 2048 bits
           label:      some_key
