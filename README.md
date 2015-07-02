@@ -4,7 +4,7 @@
 
 A tool to generate a keypair inside a PKCS#11 crypto token.
 
-# Configuration
+### Configuration
 
 `pkcs11keypair` can be configured by setting environment variables, but applies
 it's own defaults in case a variable is unset.
@@ -17,7 +17,7 @@ it's own defaults in case a variable is unset.
 *    `RSA_SIZE`: Bit size for modulus in key generation (default is `2048`,
       minimum is `1024`)
 
-# Usage
+### Usage
 
 Usage example with SoftHSM (requires libsofthsm and pkcs11-tool):
 
