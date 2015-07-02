@@ -28,19 +28,18 @@ func randomKeyID() (string, error) {
 	return fmt.Sprintf("%0x%0x", random_key[0], random_key[1]), nil
 }
 
-
-func generate_pkcs11keypair() {
+func configure() (config Config) {
 	random_id, _ := randomKeyID()
-	config := Config{"/usr/lib/softhsm/libsofthsm.so", //module
-		0,                  //slot_id
-		"0000",             //user_pin
-		"genkey_key_label", //key_label
-		random_id,          //key_id
-		2048,               //rsa_size
+	config = Config{"/usr/lib/softhsm/libsofthsm.so", //module
+		0,                     //slot_id
+		"0000",                //user_pin
+		"pkcs11keypair_label", //key_label
+		random_id,             //key_id
+		2048,                  //rsa_size
 	}
 
-	if len(os.Getenv("HSMLIB")) > 0 {
-		config.module = os.Getenv("HSMLIB")
+	if len(os.Getenv("HSM_MODULE")) > 0 {
+		config.module = os.Getenv("HSM_MODULE")
 	}
 
 	if len(os.Getenv("HSM_SLOT_ID")) > 0 {
@@ -67,13 +66,22 @@ func generate_pkcs11keypair() {
 	fmt.Printf("Using module %s, ", config.module)
 	fmt.Printf("slot ID %v, ", config.slot_id)
 	fmt.Printf("user PIN %v, ", config.user_pin)
-	fmt.Printf("rsa bit size %v, ", config.rsa_size)
 	fmt.Printf("key id '%v', ", config.key_id)
-	fmt.Printf("key label '%s'.\n", config.key_label)
+	fmt.Printf("key label '%s', ", config.key_label)
+	fmt.Printf("rsa bit size %v.\n", config.rsa_size)
 
+        if config.rsa_size < 1024 {
+            fmt.Printf("RSA size insecure, choose 1024 or more.\n")
+            os.Exit(1)
+        }
+        return config
+}
+
+func generate_pkcs11keypair() {
+        config :=configure()
 	p := pkcs11.New(config.module)
 	if p == nil {
-		fmt.Printf("Could not initialize pkcs11 with module %s, exiting.", config.module)
+		fmt.Printf("Could not initialize pkcs11 with module %s, exiting.\n", config.module)
 		os.Exit(1)
 	}
 	p.Initialize()
@@ -130,6 +138,7 @@ func generate_pkcs11keypair() {
 		pkcs11.NewAttribute(pkcs11.CKA_DECRYPT, true),
 		pkcs11.NewAttribute(pkcs11.CKA_UNWRAP, true),
 		pkcs11.NewAttribute(pkcs11.CKA_LABEL, config.key_label),
+		pkcs11.NewAttribute(pkcs11.CKA_ID, config.key_id),
 		pkcs11.NewAttribute(pkcs11.CKA_SUBJECT, "/CN=Harald Wagener"),
 	}
 	pub, priv, err := p.GenerateKeyPair(session,
@@ -140,10 +149,10 @@ func generate_pkcs11keypair() {
 		os.Exit(1)
 	} else {
 		fmt.Printf("Key pair generated:\nPublic Key: %v\nPrivate Key: %v\n", pub, priv)
-                os.Exit(0)
+		os.Exit(0)
 	}
 }
 
 func main() {
-        generate_pkcs11keypair()
+	generate_pkcs11keypair()
 }
