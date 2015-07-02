@@ -23,28 +23,25 @@ Usage example with SoftHSM (requires libsofthsm and pkcs11-tool):
 
 1.   Prepare SoftHSM token and set configuration values
 
-        ```sh
         # Create SoftHSM configuration
-        echo "0:${PWD}/softhsm.db" > softhsm.conf
+        % echo "0:${PWD}/softhsm.db" > softhsm.conf
         # Set configuration variables
-        export SOFTHSM_CONF=${PWD}/softhsm.conf
-        export HSM_MODULE=/usr/lib/softhsm/libsofthsm.so
-        export HSM_SLOT_ID=0
-        export TOKEN_LABEL=softhsm-token
-        export KEY_LABEL=some_key
-        export KEY_ID=12345
+        % export SOFTHSM_CONF=${PWD}/softhsm.conf
+        % export HSM_MODULE=/usr/lib/softhsm/libsofthsm.so
+        % export HSM_SLOT_ID=0
+        % export TOKEN_LABEL=softhsm-token
+        % export KEY_LABEL=some_key
+        % export KEY_ID=12345
         # Initialize SoftHSM slot.
-        pkcs11-tool --module ${HSM_LIB} --slot ${HSM_SLOT} --login\
+        % pkcs11-tool --module ${HSM_LIB} --slot ${HSM_SLOT} --login\
           --init-token --init-pin --label ${TOKEN_LABEL} 
-        ```
 
 (You will be prompted for SO PIN und User PIN. Don't mix them up)
 
 2.  Build and run `pkcs11keypair`
 
-        ```sh
-        go build pkcs11keypair.go
-        ./pkcs11keypair
+        % go build pkcs11keypair.go
+        % ./pkcs11keypair
         Using module /usr/lib/softhsm/libsofthsm.so, slot ID 0, user PIN 0000, key id '12345', key label 'some_key', rsa bit size 2048.
         Wanted slot id 0 and got slot id 0.
         HSM Info:
@@ -55,12 +52,10 @@ Usage example with SoftHSM (requires libsofthsm and pkcs11-tool):
         Key pair generated:
         Public Key: 2
         Private Key: 1
-        ```
 
 3. Verify that the keypair has been generated:
 
-        ```sh
-        % pkcs11-tool --module ${HSM_LIB} --so-pin 0000 --pin 0000 --login -O
+        % pkcs11-tool --module ${HSM_LIB} --login -O
         Using slot 0 with a present token (0x0)
         Public Key Object; RSA 2048 bits
           label:      some_key
@@ -69,4 +64,3 @@ Usage example with SoftHSM (requires libsofthsm and pkcs11-tool):
         Private Key Object; RSA
           label:      some_key
           Usage:      decrypt, sign, unwrap
-       ```
